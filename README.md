@@ -2,7 +2,7 @@
 An AI chat bot with a TFT screen showing the character status.
 Uses 2SPI bus, one communicates with TFT LCD; one reads from SD card
 Achieved ~30 fps refresh rate of the TFT screen by using FreeRTOS, DMA & overclocking
-
+Use I2S microphone to record audio
 
 https://github.com/user-attachments/assets/507d36e9-b06a-48fc-ae82-5705394fe05f
 
