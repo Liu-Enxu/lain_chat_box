@@ -10,11 +10,11 @@ Use I2S microphone to record audio
 https://github.com/user-attachments/assets/507d36e9-b06a-48fc-ae82-5705394fe05f
 
 BOM:
-Raspberry Pi Pico W
-ST7735 TFT LCD screen
-SD module
-INMP441 
-MAX98357
+1. Raspberry Pi Pico W
+2. ST7735 TFT LCD screen
+3. SD module
+4. INMP441
+5. MAX98357
 
 TODO:
 
