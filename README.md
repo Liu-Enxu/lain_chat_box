@@ -17,6 +17,7 @@ INMP441
 MAX98357
 
 TODO:
+
 HARDWARE
 1. Photo interface on the embedded system
 2. Add buttons built with I2C screens on hardware as user interface, symbol on the screen changes with dialog content
