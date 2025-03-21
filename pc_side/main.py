@@ -1,15 +1,33 @@
-import get_audio
 import audio_to_text
 import llm
 import resp_to_sound
-import send_audio
+import os
 import os
 import socket
+import time
 
 PORT = 9999
+OUT_PORT = 10000
 DISCOVERY_MESSAGE = b"WHERE_IS_MY_GIRLFRIEND"
 EXPECTED_RESPONSE = b"IM_HERE"
 MAX_TRY = 10
+
+INPUT_FOLDER = "input_files"
+
+# max num of audio files saved in the input folder
+MAX_FILES = 10
+
+def timestamp_to_int(filename):
+    t = filename[len("received_"):-len(".wav")]
+    return t.replace(":", "").replace("_", "")
+
+def clean_old_files(folder):
+    all_files = os.listdir(folder)
+    all_files.sort(key=timestamp_to_int)
+    
+    while len(all_files) > MAX_FILES:
+        to_be_removed = all_files.pop(0)
+        os.remove(os.path.join(folder, to_be_removed))
 
 def find_board():
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
@@ -34,6 +52,41 @@ def find_board():
 
     return board_addr
 
+def get_audio(board_addr):
+    board_ip, board_port = board_addr
+    
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((board_ip, board_port))
+        s.listen()
+
+        print(f'waiting for input from {board_ip}:{board_port}')
+        
+        conn, addr = s.accept()
+        with conn:
+            print(f'{addr} connected')
+            
+            timestamp = time.strftime('%Y_%m_%d:%H_%M_%S')
+            filename = os.path.join(INPUT_FOLDER, f"received_{timestamp}.wav")
+            
+            with open(filename, "wb") as f:
+                while chunk := conn.recv(4096):
+                    f.write(chunk)
+            
+            print(f'saved received audio: {filename}')
+
+            # optional; limit num of audio files in folder
+            clean_old_files(INPUT_FOLDER)
+
+            return filename
+
+def send_audio(file_path, board_ip):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((board_ip, OUT_PORT))
+        
+        with open(file_path, "rb") as f:
+            while chunk := f.read(4096):
+                s.sendall(chunk)
+
 def main():
     
     os.makedirs("input_files", exist_ok=True)
@@ -45,7 +98,7 @@ def main():
     
     while(True):
         # get audio from board
-        input_file = get_audio.get_audio(board_addr)
+        input_file = get_audio(board_addr)
         
         # audio -> text
         text = audio_to_text.audio_to_text(input_file)  
@@ -57,7 +110,7 @@ def main():
         output_path = resp_to_sound.resp_to_sound(resp)
         
         # send back audio
-        send_audio.send_audio(output_path, board_addr[0])
+        send_audio(output_path, board_addr[0])
         
         print(f'sent {output_path} to {board_addr}')
 
