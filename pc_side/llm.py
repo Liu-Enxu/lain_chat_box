@@ -1,4 +1,3 @@
-import os
 import ollama
 
 # character prompt for ai; used in every input
@@ -26,7 +25,7 @@ class ChatHistory:
     def add_history(self, user_input, ai_response):
         self.history.append(f"User: {user_input}\nAI: {ai_response}")
         
-        if len(self.history) > self.max_size:
+        while len(self.history) > self.max_size:
             self.history.pop(0)
 
     def get_history(self):

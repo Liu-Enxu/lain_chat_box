@@ -10,6 +10,7 @@ PORT = 9999
 OUT_PORT = 10000
 DISCOVERY_MESSAGE = b"WHERE_IS_MY_GIRLFRIEND"
 EXPECTED_RESPONSE = b"IM_HERE"
+END_MESSGE = b"DONE"
 MAX_TRY = 10
 
 INPUT_FOLDER = "input_files"
@@ -40,7 +41,7 @@ def find_board():
             sock.sendto(DISCOVERY_MESSAGE, ("255.255.255.255", PORT))
             
             try:
-                data, addr = sock.recvfrom(1024)
+                data, addr = sock.recvfrom(1024) # addr = (ip, port)
                 if data == EXPECTED_RESPONSE and addr[1] == PORT:
                     board_addr = addr
                     print(f"board addr: {board_addr}")
@@ -58,7 +59,7 @@ def get_audio(board_addr):
     board_ip, board_port = board_addr
     
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(('0.0.0.0', board_port))
+        s.bind(('0.0.0.0', PORT)) # pc bind its port
         s.listen()
 
         print(f'waiting for input from {board_ip}:{board_port}')
@@ -71,9 +72,12 @@ def get_audio(board_addr):
             filename = os.path.join(INPUT_FOLDER, f"received_{timestamp}.wav")
             
             with open(filename, "wb") as f:
-                while chunk := conn.recv(4096):
+                while True:
+                    chunk = conn.recv(4096)
+                    if END_MESSGE in chunk:
+                        f.write(chunk.split(END_MESSGE)[0])
+                        break
                     f.write(chunk)
-            
             print(f'saved received audio: {filename}')
 
             # optional; limit num of audio files in folder
@@ -88,6 +92,9 @@ def send_audio(file_path, board_ip):
         with open(file_path, "rb") as f:
             while chunk := f.read(4096):
                 s.sendall(chunk)
+        
+        # send a packet signaling END
+        s.sendall(END_MESSGE)
 
 def main():
     
