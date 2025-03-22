@@ -2,7 +2,7 @@ import audio_to_text
 import llm
 import resp_to_sound
 import os
-import os
+import sys
 import socket
 import time
 
@@ -19,7 +19,7 @@ MAX_FILES = 10
 
 def timestamp_to_int(filename):
     t = filename[len("received_"):-len(".wav")]
-    return t.replace(":", "").replace("_", "")
+    return int(t.replace(":", "").replace("_", ""))
 
 def clean_old_files(folder):
     all_files = os.listdir(folder)
@@ -35,12 +35,13 @@ def find_board():
         sock.settimeout(3)
         
         board_addr = None
+        
         for _ in range(MAX_TRY):
             sock.sendto(DISCOVERY_MESSAGE, ("255.255.255.255", PORT))
             
             try:
                 data, addr = sock.recvfrom(1024)
-                if data == EXPECTED_RESPONSE:
+                if data == EXPECTED_RESPONSE and addr[1] == PORT:
                     board_addr = addr
                     print(f"board addr: {board_addr}")
                     break
@@ -48,7 +49,8 @@ def find_board():
                 print("timeout, retry...")
 
     if not board_addr:
-        raise Exception("can't find board :(")
+        print("can't find board")
+        sys.exit()
 
     return board_addr
 
@@ -56,7 +58,7 @@ def get_audio(board_addr):
     board_ip, board_port = board_addr
     
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((board_ip, board_port))
+        s.bind(('0.0.0.0', board_port))
         s.listen()
 
         print(f'waiting for input from {board_ip}:{board_port}')
@@ -112,7 +114,7 @@ def main():
         # send back audio
         send_audio(output_path, board_addr[0])
         
-        print(f'sent {output_path} to {board_addr}')
+        print(f'sent {output_path} to {board_addr}:10000')
 
 if __name__ == "__main__":
     main()
