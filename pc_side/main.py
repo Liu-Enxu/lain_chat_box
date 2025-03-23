@@ -6,7 +6,8 @@ import sys
 import socket
 import time
 
-PORT = 9999
+DISCOVERY_PORT = 9998
+IN_PORT = 9999
 OUT_PORT = 10000
 DISCOVERY_MESSAGE = b"WHERE_IS_MY_GIRLFRIEND"
 EXPECTED_RESPONSE = b"IM_HERE"
@@ -38,11 +39,11 @@ def find_board():
         board_addr = None
         
         for _ in range(MAX_TRY):
-            sock.sendto(DISCOVERY_MESSAGE, ("255.255.255.255", PORT))
+            sock.sendto(DISCOVERY_MESSAGE, ("255.255.255.255", DISCOVERY_PORT))
             
             try:
                 data, addr = sock.recvfrom(1024) # addr = (ip, port)
-                if data == EXPECTED_RESPONSE and addr[1] == PORT:
+                if data == EXPECTED_RESPONSE and addr[1] == DISCOVERY_PORT:
                     board_addr = addr
                     print(f"board addr: {board_addr}")
                     break
@@ -59,8 +60,8 @@ def find_board():
 # testing as board
 def mock_board():
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-        sock.bind(("", PORT))
-        print(f"Mock board listening on UDP port {PORT}...")
+        sock.bind(("", DISCOVERY_PORT))
+        print(f"Mock board listening on UDP port {DISCOVERY_PORT}...")
 
         while True:
             data, addr = sock.recvfrom(1024)
@@ -76,7 +77,7 @@ def get_audio(board_addr):
     board_ip, board_port = board_addr
     
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(('0.0.0.0', PORT)) # pc bind its port
+        s.bind(('0.0.0.0', IN_PORT)) # pc bind its port
         s.listen()
 
         print(f'waiting for input from {board_ip}:{board_port}')
