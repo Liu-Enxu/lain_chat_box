@@ -55,6 +55,23 @@ def find_board():
 
     return board_addr
 
+########################################################################
+# testing as board
+def mock_board():
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+        sock.bind(("", PORT))
+        print(f"Mock board listening on UDP port {PORT}...")
+
+        while True:
+            data, addr = sock.recvfrom(1024)
+            print(f"Received '{data}' from {addr}")
+            
+            if data == DISCOVERY_MESSAGE:
+                sock.sendto(EXPECTED_RESPONSE, addr)
+                print(f"Sent expected response to {addr}")
+                sys.exit()
+########################################################################
+
 def get_audio(board_addr):
     board_ip, board_port = board_addr
     
@@ -64,9 +81,13 @@ def get_audio(board_addr):
 
         print(f'waiting for input from {board_ip}:{board_port}')
         
-        conn, addr = s.accept()
-        with conn:
-            print(f'{addr} connected')
+        while True:
+            conn, addr = s.accept()
+
+            if addr[0] != board_ip:
+                print(f"ip not expected: {addr[0]}")
+                conn.close()
+                continue
             
             timestamp = time.strftime('%Y_%m_%d:%H_%M_%S')
             filename = os.path.join(INPUT_FOLDER, f"received_{timestamp}.wav")
@@ -74,6 +95,8 @@ def get_audio(board_addr):
             with open(filename, "wb") as f:
                 while True:
                     chunk = conn.recv(4096)
+                    if not chunk:
+                            break
                     if END_MESSGE in chunk:
                         f.write(chunk.split(END_MESSGE)[0])
                         break
