@@ -1,9 +1,0 @@
-# conda is suggested to use for setting up the environemnt. Simply run `conda env create -f environment.yml`
-
-# python dependencies
-ollama
-python-dotenv
-openai-whisper
-
-# other stuff
-# ffmpeg used for whisper (sound to speech): `conda install -c conda-forge ffmpeg`

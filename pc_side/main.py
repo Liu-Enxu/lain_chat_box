@@ -64,19 +64,19 @@ def find_board():
 
 ########################################################################
 # testing as board
-def mock_board():
-    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-        sock.bind(("", DISCOVERY_PORT))
-        print(f"Mock board listening on UDP port {DISCOVERY_PORT}...")
+# def mock_board():
+#     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+#         sock.bind(("", DISCOVERY_PORT))
+#         print(f"Mock board listening on UDP port {DISCOVERY_PORT}...")
 
-        while True:
-            data, addr = sock.recvfrom(1024)
-            print(f"Received '{data}' from {addr}")
+#         while True:
+#             data, addr = sock.recvfrom(1024)
+#             print(f"Received '{data}' from {addr}")
             
-            if data == DISCOVERY_MESSAGE:
-                sock.sendto(EXPECTED_RESPONSE, addr)
-                print(f"Sent expected response to {addr}")
-                sys.exit()
+#             if data == DISCOVERY_MESSAGE:
+#                 sock.sendto(EXPECTED_RESPONSE, addr)
+#                 print(f"Sent expected response to {addr}")
+#                 sys.exit()
 ########################################################################
 
 def get_audio(board_addr):
@@ -96,7 +96,7 @@ def get_audio(board_addr):
                 conn.close()
                 continue
             
-            timestamp = time.strftime('%Y_%m_%d:%H_%M_%S')
+            timestamp = time.strftime('%Y_%m_%d__%H_%M_%S')
             filename = os.path.join(INPUT_FOLDER, f"received_{timestamp}.wav")
             
             with open(filename, "wb") as f:

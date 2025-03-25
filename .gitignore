@@ -1,12 +1,9 @@
 # custom
-<<<<<<< HEAD
 pc_side/.env
 test.ipynb
 test.py
-=======
-.env
-test.ipynb
->>>>>>> 002328f700a34162b8d844d39d1a33919d9c7636
+pc_side/output_files
+pc_side/input_files
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

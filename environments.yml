@@ -3,10 +3,13 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.12
+  - python=3.11
   - ffmpeg
+  - pytorch=2.5
+  - torchaudio=2.5
   - pip
   - pip:
       - ollama
       - python-dotenv
       - openai-whisper
+      - TTS

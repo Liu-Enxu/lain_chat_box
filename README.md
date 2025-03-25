@@ -23,5 +23,11 @@ HARDWARE
 2. Add buttons built with I2C screens on hardware as user interface, symbol on the screen changes with dialog content
 
 SOFTWARE
-1. Connect to local server/http listener on pc
+1. Connect to local server/pc for AI processing
 2. Dynamically generate character video using generative model, based on the dialog content
+3. Utilize Ollama, Whisper, and Coqui TTS
+
+----
+
+### Installation on PC/Server: 
+Clone the git repo. Conda is suggested to use for setting up the environemnt: run `conda env create -f environment.yml`
