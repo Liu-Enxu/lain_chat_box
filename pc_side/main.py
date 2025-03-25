@@ -1,10 +1,11 @@
-import audio_to_text
 import llm
 import resp_to_sound
 import os
 import sys
 import socket
 import time
+import whisper
+from dotenv import load_dotenv
 
 DISCOVERY_PORT = 9998
 IN_PORT = 9999
@@ -18,6 +19,11 @@ INPUT_FOLDER = "input_files"
 
 # max num of audio files saved in the input folder
 MAX_FILES = 10
+
+# for Whisper
+load_dotenv()
+LANG = os.getenv("LANGUAGE")
+model = whisper.load_model("large")
 
 def timestamp_to_int(filename):
     t = filename[len("received_"):-len(".wav")]
@@ -120,6 +126,10 @@ def send_audio(file_path, board_ip):
         # send a packet signaling END
         s.sendall(END_MESSGE)
 
+def audio_to_text(input_file):
+    result = model.transcribe(input_file, fp16=False, language=LANG)
+    return result["text"]
+
 def main():
     
     os.makedirs("input_files", exist_ok=True)
@@ -134,7 +144,7 @@ def main():
         input_file = get_audio(board_addr)
         
         # audio -> text
-        text = audio_to_text.audio_to_text(input_file)  
+        text = audio_to_text(input_file)  
         
         # ai gen response
         resp = llm.get_ai_response(text, chat_history)
