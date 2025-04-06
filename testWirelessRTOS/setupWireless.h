@@ -56,11 +56,13 @@ void initWireless() {
 
 void connectPC() {
   Serial.println("Connecting to PC");
+  // TODO: add a time out; like if it doesn't receive anything for 10 sec, return
   while (1) {
     packetSize = connUDP.parsePacket();
     if (packetSize) {
       memset(packetBuf,0,255);
       connUDP.read(packetBuf, min(packetSize, sizeof(packetBuf) - 1));
+      // TODO: why is the line below commented out? I think you prob want to null term
       // packetBuf[packetSize] = 0;  // null terminate
 
       PC_IP = connUDP.remoteIP();
@@ -83,6 +85,7 @@ void connectPC() {
 }
 
 void receiveFile() {
+  // TODO: i talked about this in the other files but make sure you have enough storage and handle the case when storage runs out
   createFile(reWavName,&soundFile);
   myServer.begin();
   while(1){
@@ -97,14 +100,18 @@ void receiveFile() {
   // }
   
   while (myClient.connected()){
+    // TODO: add a timeout; like add a 10 milisec delay at the end of loop
     if(myClient.available()){
       packetSize = myClient.read(packetBuf,TCP_buf_size);
+      // TODO: check if the write is successful after it. write() returns num of bytes written, so check if it == packetSize
       soundFile.write((uint8_t*)packetBuf, packetSize);
 
       if (packetSize < TCP_buf_size) {
         packetBuf[packetSize] = '\0';  // Null-terminate the buffer
+        // TODO: just a hint, rather than "25" I think you can also do strlen(END_MESSAGE)
         if (strncmp(packetBuf, END_MESSAGE, 25) == 0) {
           Serial.println("End of file reached.");
+          // TODO: null terminate the file, something like packetBuf[packetSize] = '\0';
           break;  // End of file, stop receiving
         }
       }
@@ -139,6 +146,7 @@ void sendFile(String fileName, File* file) {
 
   // begin client
   while(1){
+    // TODO: add a little time out
     if (myClient.connect(PC_IP, OUT_PORT)) {Serial.println("Connected to PC, start to send!");break;}
   }
   vTaskDelay(pdMS_TO_TICKS(10));

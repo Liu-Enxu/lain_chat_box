@@ -109,6 +109,7 @@ void SDTask(void *params) {
         pixelIdx = (pixelIdx + 1) % (TFT_WIDTH * TFT_HEIGHT);
         if (!pixelIdx) {
           // xSemaphoreTake(xbufID_Mutex, portMAX_DELAY);
+          // TODO: potential race condition here
           frame_buf_id = !frame_buf_id;  // Flip buffer ID
           // xSemaphoreGive(xbufID_Mutex);
 
@@ -143,6 +144,7 @@ void TFTTask(void *params) {
     // current_buf_id = !frame_buf_id; // Read the safe buffer index
     // xSemaphoreGive(xbufID_Mutex);
 
+    // TODO: samething as in SDTask, you prob wanna protect frame_buf_id
     img.pushImage(0, 0, TFT_WIDTH, TFT_HEIGHT, (uint16_t *)(frames[!frame_buf_id]), 16U);
 
     img.drawString("ms/f: " + String(end_TFT - start_TFT), 0, 0, 2);

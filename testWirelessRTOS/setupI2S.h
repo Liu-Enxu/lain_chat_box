@@ -114,6 +114,7 @@ void create_wav(String fileName){
   rec_size_counter = 0;
   buffer_idx = 0;
 
+  // TODO: I think there could be some issues with this function. See that setupSD.h for detail. It is best if this function returns some value if the creating file succeeds, then the program proceeds based on that
   // open new file and init
   createFile(fileName,&soundFile);
 
@@ -129,6 +130,7 @@ void save_wav(){
   // Serial.println("Exitted!");
   // Rewrite the header
   soundFile.seek(0);
+  // TODO: I think you should check the available storage first to see if you can write the file
   generate_wav_header(wav_header, rec_size_counter, SAMPLE_RATE);
   soundFile.write(wav_header,WAV_HEADER_SIZE);
   digitalWrite(LED_BUILTIN,0);
@@ -144,6 +146,7 @@ void play_wav(String fileName){
   digitalWrite(shutDownPin,1);
   
   openFile(fileName,&soundFile);
+  // TODO: I think you should check if soundfile is available here and jump to the end if it doesn't exist
   soundFile.seek(44);
 
   // start_I2S = micros();
@@ -166,10 +169,12 @@ void play_wav(String fileName){
 
 void recordingTask(void *pvParameters){
   
+  // TODO: again, I think you should check for storage
   create_wav(myWavName);
   // Start recording
   digitalWrite(LED_BUILTIN,1);
   // Serial.printf("Start recording ...\n");
+  // TODO: maybe implement some time out here, so it doesn't drain resource
   while(1){
     if (xSemaphoreTake(xSemaphoreRecording_Done, 0) == pdTRUE || failFlag) {
       Serial.println("Stop recording!");
@@ -188,8 +193,11 @@ void recordingTask(void *pvParameters){
     buffer_idx += 2;
     rec_size_counter += 2;
 
+    // TODO: I think you should also use semaphore here to avoid race condition
+    // TODO: there could be a potential buffer overflow here. buffer_idx increments by 2 everytime but you need to make sure that it doesn't supass rec_buffer0, else it will overflow the buffer
     if(rec_size_counter % rec_buf_size == 0){
       // Serial.printf("new buffer\n");
+      // TODO: the failFlag should be synchronized; i.e., use semaphore
       if(soundFile.write(rec_buffer0, rec_buf_size) != rec_buf_size){failFlag = true;Serial.printf("Write Failed!\n");}
       buffer_idx = 0;
     }

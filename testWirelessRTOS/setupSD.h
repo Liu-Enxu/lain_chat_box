@@ -45,6 +45,7 @@ void createFile(String fileName,File* file){
   Serial.print("Checking for old file...");
   deleteFile(fileName);
 
+  // TODO: I am not sure about this while(1). could this cause an infinitely loop? I see that you check for file existence in deleteFile() but not here. What if file doesn't exist? What if the file is too long and you run out of storage?
   while(1){
     *file = SD1.open(fileName.c_str(), FILE_WRITE);
     if(*file){break;}
