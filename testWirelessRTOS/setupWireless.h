@@ -67,12 +67,12 @@ void connectPC() {
       // Serial.print("Received UDP: "+String(packetBuf)+" from ");
       // Serial.println(PC_IP);
 
-      if (strcmp(packetBuf, DISCOVERY_MESSAGE) == 0) {
+      if (strncmp(packetBuf, DISCOVERY_MESSAGE, 25) == 0) {
         // Serial.println("Discovery request received! Sending response...");
         connUDP.beginPacket(PC_IP, connUDP.remotePort());
         connUDP.write(EXPECTED_RESPONSE);
         connUDP.endPacket();
-      } else if (strcmp(packetBuf, END_MESSAGE) == 0) {
+      } else if (strncmp(packetBuf, END_MESSAGE) == 0) {
         connUDP.stop();
         break;
       }
@@ -103,7 +103,7 @@ void receiveFile() {
 
       if (packetSize < TCP_buf_size) {
         packetBuf[packetSize] = '\0';  // Null-terminate the buffer
-        if (strcmp(packetBuf, END_MESSAGE) == 0) {
+        if (strncmp(packetBuf, END_MESSAGE, 25) == 0) {
           Serial.println("End of file reached.");
           break;  // End of file, stop receiving
         }
@@ -129,7 +129,7 @@ void sendFile(String fileName, File* file) {
   // while (myClient.connected()) {
   //   if(myClient.available()){
   //     packetSize = myClient.read(packetBuf,TCP_buf_size);
-  //     if (strcmp(packetBuf, END_MESSAGE) == 0) {
+  //     if (strncmp(packetBuf, END_MESSAGE, 25) == 0) {
   //       Serial.println("PC ready");
   //       break;  // End of file, start receiving
   //     }
