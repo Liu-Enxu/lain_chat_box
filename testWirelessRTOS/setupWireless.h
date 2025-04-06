@@ -4,8 +4,8 @@
 #include <WiFiUdp.h>
 #include "setupI2S.h"
 
-#define WIFI_SSID "MOTOEE8E"
-#define WIFI_PASS "z3887u85fn"
+#define WIFI_SSID "mywifi"
+#define WIFI_PASS "mypassword"
 
 #define DISCOVERY_MESSAGE "WHERE_IS_MY_GIRLFRIEND"
 #define EXPECTED_RESPONSE "IM_HERE"
