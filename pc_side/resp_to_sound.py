@@ -1,23 +1,10 @@
 import os
 import time
-import torch
-from TTS.utils.radam import RAdam
-from TTS.api import TTS
-from dotenv import load_dotenv
 
 OUTPUT_FOLDER = "output_files"
 MAX_FILES = 10
 
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
-
-load_dotenv()
-MODEL = os.getenv("TTS_MODEL")
-
-torch.serialization.add_safe_globals([RAdam])
-
-# change cpu to cuda if it's installed
-device = "cuda" if torch.cuda.is_available() else "cpu"
-tts = TTS(model_name=MODEL, progress_bar=False).to(device)
 
 def timestamp_to_int(filename):
     t = filename[len("response_"):-len(".wav")]
@@ -32,11 +19,11 @@ def clean_old_files(folder):
         os.remove(os.path.join(folder, to_be_removed))
 
 def resp_to_sound(resp_text):
-    timestamp = time.strftime('%Y_%m_%d__%H_%M_%S')
+    timestamp = time.strftime('%Y_%m_%d:%H_%M_%S')
     output_filename = f"response_{timestamp}.wav"
     output_path = os.path.join(OUTPUT_FOLDER, output_filename)
 
-    tts.tts_to_file(text=resp_text, file_path=output_path)
+    # TODO: impl actual func
 
     clean_old_files(OUTPUT_FOLDER)
 
