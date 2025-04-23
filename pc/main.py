@@ -19,6 +19,8 @@ INPUT_FOLDER = "input_files"
 
 # max num of audio files saved in the input folder
 MAX_FILES = 10
+INPUT_FOLDER = os.path.join(os.getcwd(),"input_files")
+OUTPUT_FOLDER = os.path.join(os.getcwd(),"output_files")
 
 # for Whisper
 load_dotenv()
