@@ -16,7 +16,7 @@
 #define TEXT_END_MESSAGE "TEXTEND"
 #define AUDIO_END_MESSAGE "AUDIOEND"
 
-#define END_MESSAGE "DONE"
+#define END_MESSAGE "THIS_IS_END_MESSAGE"
 
 bool recv_audio = false;
 bool recv_text = false;
@@ -86,7 +86,7 @@ void connectPC() {
 
     }
   }
- debugOLED("Connected to PC IP.","",false);
+  debugOLED("Connected to PC IP.","",false);
 }
 
 void receiveFile() {
@@ -211,10 +211,16 @@ void sendFile(String fileName, File* file) {
     // watchdog_update();
     fileBytesRead = file->readBytes((char *)fileBuffer, sizeof(fileBuffer));
     myClient.write(fileBuffer,fileBytesRead);
-    vTaskDelay(pdMS_TO_TICKS(10));
+    vTaskDelay(pdMS_TO_TICKS(20));
   }
   myClient.write(END_MESSAGE,sizeof(END_MESSAGE));
-  
+
+  // wait for pc ack
+  packetSize = myClient.read(packetBuf, sizeof(packetBuf));
+  if (strncmp(packetBuf, "FILE_RECEIVED", packetSize) == 0) {
+    break;
+  }
+
   myClient.stop();
   closeFile(file);
   debugOLED("File sent successfully.","Sys",true);

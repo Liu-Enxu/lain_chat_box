@@ -12,7 +12,7 @@ IN_PORT = 9999
 OUT_PORT = 10000
 DISCOVERY_MESSAGE = b"WHERE_IS_MY_GIRLFRIEND"
 EXPECTED_RESPONSE = b"IM_HERE"
-END_MESSGE = b"DONE"
+END_MESSGE = b"THIS_IS_END_MESSAGE"
 MAX_TRY = 10
 
 INPUT_FOLDER = "input_files"
@@ -110,6 +110,7 @@ def get_audio(board_addr):
                         f.write(chunk.split(END_MESSGE)[0])
                         break
                     f.write(chunk)
+                s.sendall(b'FILE_RECEIVED')
             print(f'saved received audio: {filename}')
 
             # optional; limit num of audio files in folder
