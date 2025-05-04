@@ -5,8 +5,8 @@
 #include "setupI2S.h"
 #include "setupOLED.h"
 
-#define WIFI_SSID "MOTOEE8E"
-#define WIFI_PASS "z3887u85fn"
+#define WIFI_SSID ""
+#define WIFI_PASS ""
 
 #define DISCOVERY_MESSAGE "WHERE_IS_MY_GIRLFRIEND"
 #define EXPECTED_RESPONSE "IM_HERE"
